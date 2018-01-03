@@ -20,7 +20,7 @@ db_name = url.path[1:]
 db_host = url.hostname
 db_user = url.username
 db_password = url.password
-db_port=url.port
+# db_port=url.port
 
 class DBSingelton():
 	db = None
