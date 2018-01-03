@@ -2,7 +2,7 @@ import os
 from peewee import Model
 from playhouse.pool import PooledPostgresqlDatabase
 from urllib import parse
-import psycopg2
+
 
 
 parse.uses_netloc.append("postgres")
