@@ -60,7 +60,7 @@ def create_place():
 @app.route("/api/v1.0/place", methods = ["GET"])
 def get_all_place():
 	place = PlaceModel.select().order_by(PlaceModel.ID).dicts()
-	return jsonify({'places':list(place)})
+	return jsonify({'count':place.count()},{'places':list(place)})
 
 #The GET request is used to fetch a single place from the database.
 @app.route("/api/v1.0/place/<int:place_id>", methods = ["GET"])
