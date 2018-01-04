@@ -37,10 +37,10 @@ def disconnect_db(err=None):
 def index():
 	return "He is mine"
 
-# curl -X POST -d "NameOfPlace=East Lagon&Description=This is the hub of the nation&long=123121&lat=321111&PhotoPlace=madina&PhotoQrcode=ncdwn323&PhoneNumberPlace1=321112121&PhoneNumberPlace2=44232322" localhost:5000/api/v1.0/place
+# curl -X POST -d "NameOfPlace=East Lagon&Description=This is the hub of the nation&long=123121&lat=321111&PhotoPlace=madina&PhotoQrcode=ncdwn323&PhoneNumberPlace1=321112121&PhoneNumberPlace2=44232322" localhost:5000/api/place
 
 #This function Creates a Place in the PlaceModel table. Fetches the data from a form and then inserts into the table.
-@app.route("/api/v1.0/place", methods = ["POST"])
+@app.route("/api/place", methods = ["POST"])
 def create_place():
 	NameOfPlace = request.form['NameOfPlace']
 	Description = request.form['Description']
@@ -57,13 +57,13 @@ def create_place():
 	return jsonify({"message":success_message})
 
 #The GET request is used to fetch all the places from the database.
-@app.route("/api/v1.0/place", methods = ["GET"])
+@app.route("/api/place", methods = ["GET"])
 def get_all_place():
 	place = PlaceModel.select().order_by(PlaceModel.ID).dicts()
 	return jsonify({'places':list(place)})
 
 #The GET request is used to fetch a single place from the database.
-@app.route("/api/v1.0/place/<int:place_id>", methods = ["GET"])
+@app.route("/api/place/<int:place_id>", methods = ["GET"])
 def get_a_place(place_id):
 	place = PlaceModel.select().where(PlaceModel.ID == place_id).order_by(PlaceModel.ID).dicts()
 	if len(place) == 0:
@@ -72,7 +72,7 @@ def get_a_place(place_id):
 	return jsonify({'places':list(place)})
 
 #The DELETE request is used to delete a place from the database.
-@app.route("/api/v1.0/place/<int:place_id>", methods = ["DELETE"])
+@app.route("/api/lace/<int:place_id>", methods = ["DELETE"])
 def delete_a_place(place_id):
 	place = PlaceModel.select().where(PlaceModel.ID == place_id)
 	if len(place) != 0:
@@ -84,7 +84,7 @@ def delete_a_place(place_id):
 	return jsonify({"message":success_message})
 
 #The PUT request is used to update a single place in the table	
-@app.route("/api/v1.0/place/<int:place_id>", methods = ['PUT'])
+@app.route("/api/place/<int:place_id>", methods = ['PUT'])
 def update_place(place_id):
 	place = PlaceModel.get(PlaceModel.ID == place_id)
 	temp_place = place._data
@@ -95,7 +95,7 @@ def update_place(place_id):
 	return jsonify({"message":success_message})
 
 #The POST request is used here to create a user data and the hashlib is used to hash the password that is saved.
-@app.route("/api/v1.0/user", methods = ['POST'])
+@app.route("/api/user", methods = ['POST'])
 def create_user():
 	NameOfUser = request.form['NameOfUser']
 	Email = request.form['Email']
@@ -111,7 +111,7 @@ def create_user():
 	return jsonify({"message":success_message})
 
 #This function gets all users in the user table
-@app.route('/api/v1.0/user', methods = ['GET'])
+@app.route('/api/user', methods = ['GET'])
 def get_all_users():
 	users = UserModel.select().order_by(UserModel.ID).dicts()
 	if len(users) == 0:
@@ -120,7 +120,7 @@ def get_all_users():
 	return jsonify({'users':list(users)})
 
 #This function gets a specific use in the user table
-@app.route('/api/v1.0/user/<int:user_id>', methods = ['GET'])
+@app.route('/api/user/<int:user_id>', methods = ['GET'])
 def get_a_user(user_id):
 	a_user = UserModel.select().where(UserModel.ID == user_id).dicts()
 	if len(a_user) == 0:
@@ -129,7 +129,7 @@ def get_a_user(user_id):
 	return jsonify({'users':list(a_user)})
 
 #This function deletes a specific user record
-@app.route('/api/v1.0/user/<int:user_id>', methods = ['DELETE'])
+@app.route('/api/user/<int:user_id>', methods = ['DELETE'])
 def delete_a_user(user_id):
 	a_user = UserModel.select().where(UserModel.ID == user_id)
 	if len(a_user) != 0:
@@ -141,7 +141,7 @@ def delete_a_user(user_id):
 	return jsonify({"message":success_message})
 
 #This function makes it possible to edit a user record field
-@app.route('/api/v1.0/user/<int:user_id>', methods = ['PUT'])
+@app.route('/api/user/<int:user_id>', methods = ['PUT'])
 def update_user(user_id):
 	user_data = UserModel.select().where(UserModel.ID == user_id)
 	if len(user_data) == 0:
