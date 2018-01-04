@@ -60,7 +60,7 @@ def create_place():
 @app.route("/api/v1.0/place", methods = ["GET"])
 def get_all_place():
 	place = PlaceModel.select().order_by(PlaceModel.ID).dicts()
-	return jsonify({'count':place.count()},{'places':list(place)})
+	return jsonify({'count':place.count()}, {'places':list(place)})
 
 #The GET request is used to fetch a single place from the database.
 @app.route("/api/v1.0/place/<int:place_id>", methods = ["GET"])
@@ -69,7 +69,7 @@ def get_a_place(place_id):
 	if len(place) == 0:
 		success_message = "No record Found"
 		return jsonify({"message":success_message})
-	return jsonify({'places':list(place)})
+	return jsonify({'count':place.count()}, {'places':list(place)})
 
 #The DELETE request is used to delete a place from the database.
 @app.route("/api/v1.0/place/<int:place_id>", methods = ["DELETE"])
@@ -117,7 +117,7 @@ def get_all_users():
 	if len(users) == 0:
 		success_message = "No record Found"
 		return jsonify({"message":success_message})
-	return jsonify({'users':list(users)})
+	return jsonify({'count':place.count()}, {'users':list(users)})
 
 #This function gets a specific use in the user table
 @app.route('/api/v1.0/user/<int:user_id>', methods = ['GET'])
@@ -126,7 +126,7 @@ def get_a_user(user_id):
 	if len(a_user) == 0:
 		success_message = "No record Found"
 		return jsonify({"message":success_message})
-	return jsonify({'users':list(a_user)})
+	return jsonify({'count':place.count()}, {'users':list(a_user)})
 
 #This function deletes a specific user record
 @app.route('/api/v1.0/user/<int:user_id>', methods = ['DELETE'])
