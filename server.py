@@ -126,7 +126,7 @@ def get_a_user(user_id):
 	if len(a_user) == 0:
 		success_message = "No record Found"
 		return jsonify({"message":success_message})
-	return jsonify({'count':users.count()}, {'users':list(a_user)})
+	return jsonify({'count':a_user.count()}, {'users':list(a_user)})
 
 #This function deletes a specific user record
 @app.route('/api/v1.0/user/<int:user_id>', methods = ['DELETE'])
