@@ -4,15 +4,18 @@ There is a Place and User tables, where the CRUD operation is applied on each.
 """
 
 import os, sys, hashlib, uuid 
-
+import bcrypt
 sys.path.append(os.getcwd())
 
 from flask import Flask, render_template, redirect, session, request, jsonify
 from models.jamestown_model import PlaceModel
 from models.jamestown_model import UserModel
+from models.jamestown_model import AdminModel
 from models.base_model import DBSingelton
 
 app = Flask(__name__)
+app.secret_key = "12345"
+
 
 @app.before_first_request
 def initialize_tables():
@@ -21,6 +24,8 @@ def initialize_tables():
 		PlaceModel.create_table()
 	if not UserModel.table_exists() :
 		UserModel.create_table()
+	if not AdminModel.table_exists() :
+		AdminModel.create_table()
 
 	disconnect_db()
 
@@ -35,7 +40,7 @@ def disconnect_db(err=None):
 
 @app.route('/')
 def index():
-	return "He is mine"
+	return render_template('login.html')
 
 # curl -X POST -d "NameOfPlace=East Lagon&Description=This is the hub of the nation&long=123121&lat=321111&PhotoPlace=madina&PhotoQrcode=ncdwn323&PhoneNumberPlace1=321112121&PhoneNumberPlace2=44232322" localhost:5000/api/v1.0/place
 
@@ -60,7 +65,7 @@ def create_place():
 @app.route("/api/v1.0/place", methods = ["GET"])
 def get_all_place():
 	place = PlaceModel.select().order_by(PlaceModel.ID).dicts()
-	return jsonify({'count':place.count()}, {'places':list(place)})
+	return jsonify({'count':place.count()}, {'result':list(place)})
 
 #The GET request is used to fetch a single place from the database.
 @app.route("/api/v1.0/place/<int:place_id>", methods = ["GET"])
@@ -94,6 +99,13 @@ def update_place(place_id):
 	success_message = "Successfully Updated record with ID {}".format(place_id)
 	return jsonify({"message":success_message})
 
+#This Function Hashes the pasword
+def hash_password(pswrd):
+	salt = uuid.uuid4().hex
+	return hashlib.sha512(pswrd.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+	
+
+
 #The POST request is used here to create a user data and the hashlib is used to hash the password that is saved.
 @app.route("/api/v1.0/user", methods = ['POST'])
 def create_user():
@@ -102,8 +114,9 @@ def create_user():
 	Password = request.form['Password']
 
 
-	salt = uuid.uuid4().hex
-	hashed_password = hashlib.sha512(Password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+	# salt = uuid.uuid4().hex
+	# hashed_password = hashlib.sha512(Password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+	hashed_password = hash_password(Password)
 	save_user = UserModel(NameOfUser = NameOfUser, Email = Email, Password = hashed_password)
 	save_user.save()
 
@@ -162,4 +175,52 @@ def update_user(user_id):
 	success_message = "Record Updated Successfully"
 	return jsonify({"message":success_message})
 
+#This is the registration route
+@app.route('/api/v1.0/admin', methods = ['POST'])
+def create_admin():
+	last_name = request.form['last_name']
+	first_name = request.form['first_name']
+	Email = request.form['Email']
+	Password = request.form['Password']
+	password_confirmation = request.form['password_confirmation']
+	NameOfUser = last_name + " " + first_name
 
+	if Password != password_confirmation:
+		return render_template('register.html', message = "password not the same")
+	salt = bcrypt.gensalt()
+	hashed_password = bcrypt.hashpw(Password, salt)
+	save_user = AdminModel(NameOfUser = NameOfUser, Email = Email, Password = hashed_password)
+	save_user.save()
+	success_message = "Added Successfully"
+	# return jsonify({"message":success_message})
+	return render_template('login.html')
+
+
+#This function logs in a user
+@app.route('/api/v1.0/login', methods=['POST'])
+def log_in_user():
+	Email = request.form['email']
+	Password = request.form['password']
+	querry_users = AdminModel.select().where(AdminModel.Email == Email).first()
+	
+
+	if (querry_users == 0 and bcrypt.hashpw(Password, querry_users.Password) == querry_users.Password):
+		success_message='No Results Found'
+		return jsonify({"message ":success_message})
+	session['logged_in']=True
+	session['username']=querry_users.NameOfUser
+	# return jsonify([{"message":"successful Login"},{"user":session['username']},{"Login_status":session['logged_in']}])
+	message = "successful Login"
+	user = session['username']
+	login_status = session['logged_in']
+
+	places = len(PlaceModel.select())
+
+
+
+	return render_template('index.html', places = places, message = message, user = user, login_status = login_status)
+	# return("Hello")
+
+@app.route('/register', methods=['GET'])
+def register_page():
+	return render_template('register.html')

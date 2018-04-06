@@ -20,3 +20,11 @@ class UserModel(BaseModel):
 	Password = CharField(250)
 	DateCreated = DateTimeField(default=datetime.now)
 
+
+class AdminModel(BaseModel):
+	ID = PrimaryKeyField()
+	NameOfUser = CharField(50)
+	Email = CharField(50)
+	Password = CharField(250)
+	DateCreated = DateTimeField(default=datetime.now)
+
